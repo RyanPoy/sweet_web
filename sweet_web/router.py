@@ -30,6 +30,7 @@ class Route(object):
         self.controller = controller
         self.action = action
         self.reg_uri = None
+        self.slash_count = uri.count('/')
         self.pattern = None
         self.name_and_type = oDict()
         self._init_reg_uri()
@@ -69,7 +70,6 @@ class Route(object):
                 continue
             gs = m.groups()
             t = 's:' if gs[0] is None or gs[0] == ':' else gs[0]
-
             if t == 'r': # reg
                 buff.append(item)
             elif t not in self.RE_MAPPING:
@@ -129,7 +129,8 @@ class Router(object):
     
     def __init__(self):
         self.static_routes = {}
-        self.dynamic_routes = []
+        self.dynamic_routes = {}
+        self.max_slash_count = 0
 
     def add(self, uri, methods, controller, action):
         uri = add_slash(uri)
@@ -138,7 +139,8 @@ class Router(object):
         if r.is_static():
             self.static_routes[uri] = r
         else:
-            self.dynamic_routes.append(r)
+            self.dynamic_routes.setdefault(r.slash_count, []).append(r)
+            self.max_slash_count = max(self.dynamic_routes.keys())
         return self
 
     def match(self, uri, method):
@@ -165,8 +167,20 @@ class Router(object):
         return route, {}
 
     def _dynamic_match(self, uri, method):
-        for r in self.dynamic_routes:
-            is_match, param_dict = r.match(uri, method)
-            if is_match:
-                return r, param_dict
-        return None, {}
+        slash_count = uri.count('/')
+        if slash_count > self.max_slash_count:
+            for rs in self.dynamic_routes.values():
+                for r in rs:
+                    is_match, param_dict = r.match(uri, method)
+                    if is_match:
+                        return r, param_dict
+            return None, {}
+        else:
+            for cnt in self.dynamic_routes.keys():
+                if cnt < slash_count:
+                    continue
+                for r in self.dynamic_routes.get(cnt):
+                    is_match, param_dict = r.match(uri, method)
+                    if is_match:
+                        return r, param_dict
+            return None, {}
