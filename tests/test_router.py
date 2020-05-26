@@ -8,8 +8,8 @@ import unittest
 
 class FooController(Controller):
         
-        def foo_action(self):
-            pass
+    def foo_action(self):
+        pass
 
 
 class TestRouter(unittest.TestCase):
