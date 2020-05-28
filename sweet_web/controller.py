@@ -5,15 +5,12 @@ from sanic.exceptions import InvalidUsage, NotFound
 from hashlib import md5
 
 
-class Controller(HTTPMethodView):
+class Controller(object):
 
-    def dispatch_request(self, request, *args, **kwargs):
-        handler = getattr(self, request.method.lower(), None)
+    def __init__(self, request):
         self.request = request
         self.uri = str(request.raw_url, encoding="utf-8")
         self.prepare()
-        self.before()
-        return handler(*args, **kwargs)
 
     def before(self):
         pass
