@@ -8,14 +8,6 @@ import functools
 from sanic.response import text, json
 
 
-logging.basicConfig(
-    level=logging.DEBUG, 
-    format="%(asctime)s - %(name)s [%(levelname)s]: %(message)s",
-)
-logger = logging.getLogger('Sweet-App')
-
-
-
 class Application(object):
 
     def __init__(self, router):
@@ -28,7 +20,7 @@ class Application(object):
             backlog=100, stop_event=None, register_sys_signals=True,
             access_log=None, **kwargs):
 
-        logger.info('Run at %s:%s' % (host, port))
+        print ('Run mode at %s:%s' % (host, port))
 
         self.app.run(host=host, port=port, debug=debug, workers=workers, backlog=backlog,
             stop_event=stop_event, register_sys_signals=register_sys_signals,
