@@ -11,93 +11,102 @@ class FooController(Controller):
     def foo_action(self):
         pass
 
+class FakeController(object):
+    def foo_actoin(self):
+        pass
+
 
 class TestRouter(unittest.TestCase):
 
     def setUp(self):
         self.router = Router()
 
+    def test_should_give_me_error_when_handler_not_controller_subclass(self):
+        with self.assertRaises(Exception) as err:
+            Route("/save/<i:age>", 'get', FakeController, 'foo_action')
+        self.assertEqual("'FakeController' does not a Controller class", str(err.exception))
+
     def test_dynamic_int(self):
-        r = Route("/save/<i:age>", ['get'], FooController, 'foo_action')
+        r = Route("/save/<i:age>", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/(\\d+)/$", r.reg_uri)
         self.assertEqual(FooController, r.controller)
         self.assertEqual('foo_action', r.action)
         self.assertEqual(oDict({'age': int}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
-        r = Route("/save/<i:age>/suffix", ['get'], FooController, 'foo_action')
+        r = Route("/save/<i:age>/suffix", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/(\\d+)/suffix/$", r.reg_uri)
         self.assertEqual(oDict({'age': int}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
     def test_dynamic_float(self):
-        r = Route("/floatAction/<f:value>", ['get'], FooController, 'foo_action')
+        r = Route("/floatAction/<f:value>", 'get', FooController, 'foo_action')
         self.assertEqual("^/floatAction/(\\d+(?:\\.\\d+)?)/$", r.reg_uri)
         self.assertEqual(oDict({'value': float}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
-        r = Route("/floatAction/<f:value>/suffix", ['get'], FooController, 'foo_action')
+        r = Route("/floatAction/<f:value>/suffix", 'get', FooController, 'foo_action')
         self.assertEqual("^/floatAction/(\\d+(?:\\.\\d+)?)/suffix/$", r.reg_uri)
         self.assertEqual(oDict({'value': float}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
     def test_dynamic_str(self):
-        r = Route("/save/<s:name>", ['get'], FooController, 'foo_action')
+        r = Route("/save/<s:name>", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/]+)/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
-        r = Route("/save/<s:name>/suffix", ['get'], FooController, 'foo_action')
+        r = Route("/save/<s:name>/suffix", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/]+)/suffix/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
     def test_dynamic_path(self):
-        r = Route("/save/<p:name>", ['get'], FooController, 'foo_action')
+        r = Route("/save/<p:name>", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/(.+)/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
-        r = Route("/save/<p:name>/suffix", ['get'], FooController, 'foo_action')
+        r = Route("/save/<p:name>/suffix", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/(.+)/suffix/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
     def test_dynamic_default(self):
-        r = Route("/save/<name>", ['get'], FooController, 'foo_action')
+        r = Route("/save/<name>", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/]+)/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
-        r = Route("/save/<name>/suffix", ['get'], FooController, 'foo_action')
+        r = Route("/save/<name>/suffix", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/]+)/suffix/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
     def test_dynamic_default2(self):
-        r = Route("/save/<:name>", ['get'], FooController, 'foo_action')
+        r = Route("/save/<:name>", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/]+)/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
-        r = Route("/save/<:name>/suffix", ['get'], FooController, 'foo_action')
+        r = Route("/save/<:name>/suffix", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/]+)/suffix/$", r.reg_uri)
         self.assertEqual(oDict({'name': str}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
     def test_dynamic_list(self):
-        r = Route("/save/<a:ids>", ['get'], FooController, 'foo_action')
+        r = Route("/save/<a:ids>", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/|^,]*(?:,[^/]*))/$", r.reg_uri)
         self.assertEqual(oDict({'ids': list}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
-        r = Route("/save/<a:ids>/suffix", ['get'], FooController, 'foo_action')
+        r = Route("/save/<a:ids>/suffix", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/|^,]*(?:,[^/]*))/suffix/$", r.reg_uri)
         self.assertEqual(oDict({'ids': list}), r.name_and_type)
         self.assertEqual(False, r.is_static())
 
     def test_complex(self):
-        r = Route("/save/<name>/<i:age>/<a:categories>", ['get'], FooController, 'foo_action')
+        r = Route("/save/<name>/<i:age>/<a:categories>", 'get', FooController, 'foo_action')
         self.assertEqual("^/save/([^/]+)/(\\d+)/([^/|^,]*(?:,[^/]*))/$", r.reg_uri)
         self.assertEqual(oDict({'name': str, 'age': int, 'categories': list}), r.name_and_type)
         self.assertEqual(False, r.is_static())
