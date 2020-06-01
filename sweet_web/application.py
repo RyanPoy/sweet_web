@@ -14,7 +14,7 @@ class Application(object):
         cls = self.__class__
         self.app = Sanic('sweet-web')
         self.app.add_route(self.dispatch, '/', methods=Route.HTTP_METHODS)
-        self.app.add_route(self.dispatch, '/<furi:path>', methods=Route.HTTP_METHODS)
+        self.app.add_route(self.dispatch, '/<full_uri:path>', methods=Route.HTTP_METHODS)
         if router:
             self.static_routes = {}
             self.dynamic_routes = {}
@@ -31,8 +31,7 @@ class Application(object):
             stop_event=stop_event, register_sys_signals=register_sys_signals,
             access_log=access_log, auto_reload=debug, **kwargs)
 
-    async def dispatch(self, request, furi=None):
-
+    async def dispatch(self, request, full_uri=None):
         http_method = request.method.upper()
         uri = str(request.raw_url, encoding="utf-8")
         route, param_dict = self.router.match(uri, http_method)

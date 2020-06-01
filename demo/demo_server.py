@@ -10,21 +10,23 @@ class UserController(Controller):
         return self.render_str('UserController#list')
 
     def show(self, id):
-        return self.render_str('UserController#show:%s[%s]' % (id, type(id)))
+        return self.render_str('UserController#show:%s' % id)
 
     def create(self):
-        return self.render_str('UserController#create')
+        name = self.arg('name')
+        age = self.int_arg('age')
+        return self.render_str('UserController#create: User["%s", %s]' % (name, age))
 
     def new(self):
         return self.render_str('UserController#new')
 
     def delete(self, id):
-        print ("delete")
-        return self.render_str('UserController#delete:%s[%s]' % (id, type(id)))
+        return self.render_str('UserController#delete:%s' % id)
 
     def update(self, id):
-        print ("update")
-        return self.render_str('UserController#update:%s[%s]' % (id, type(id)))
+        name = self.arg('name')
+        age = self.int_arg('age')
+        return self.render_str('UserController#update: User[%s, "%s", %s]' % (id, name, age))
 
 
 class HelloController(Controller):
@@ -35,11 +37,11 @@ class HelloController(Controller):
 
     @get('/hello2/<name>')
     async def hello2(self, name):
-        return self.render_str('HelloController#Hello2: %s[%s]' % (name, type(name)))
+        return self.render_str('HelloController#Hello2: %s' % name)
 
     @route('/hello3/<name>', methods=['GET', 'POST'])
     async def hello3(self, name):
-        return self.render_str('HelloController#Hello3: %s[%s], HTTP[%s]' % (name, type(name), self.request.method.upper()))
+        return self.render_str('HelloController#Hello3: %s' % name)
 
 
 router = Router()
