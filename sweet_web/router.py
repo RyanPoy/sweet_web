@@ -27,7 +27,7 @@ class Route(object):
         uri = add_slash(uri)
         self.uri = uri
         self.method = self._init_method(method)
-        self.controller = self.check_controller(controller)
+        self.controller = controller
         self.action = action
         self.reg_uri = None
         self.slash_count = uri.count('/')
@@ -40,13 +40,6 @@ class Route(object):
         if method not in self.HTTP_METHODS:
             raise self.DefineError("Can not support http method[%s]" % method)
         return method
-
-    def check_controller(self, controller):
-        from sweet_web.controller import Controller
-
-        if issubclass(controller, Controller):
-            return controller
-        raise Exception("'%s' does not a Controller class" % controller.__name__)
 
     def is_static(self):
         return self.reg_uri is None
