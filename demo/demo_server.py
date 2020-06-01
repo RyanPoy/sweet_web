@@ -1,11 +1,19 @@
 #coding: utf8
-from sweet_web.application import Application
+from sweet_web.application import *
 from sweet_web.controller import Controller
 from sweet_web.router import Router
 
 
 class UserController(Controller):
     
+    @get('/hello')
+    async def hello(self):
+        return self.render_str('UserController#Hello')
+
+    @get('/hello2/<name>')
+    async def hello2(self, name):
+        return self.render_str('UserController#Hello2: %s[%s]' % (name, type(name)))
+
     async def list(self):
         return self.render_str('UserController#list')
 

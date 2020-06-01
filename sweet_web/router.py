@@ -1,7 +1,6 @@
 #coding: utf8
 from collections import namedtuple, OrderedDict as oDict
 from sanic.exceptions import MethodNotSupported, NotFound
-from sweet_web.controller import Controller
 import re
 
 add_slash = lambda uri: uri if uri.endswith('/') else '%s/' % uri
@@ -43,6 +42,8 @@ class Route(object):
         return method
 
     def check_controller(self, controller):
+        from sweet_web.controller import Controller
+
         if issubclass(controller, Controller):
             return controller
         raise Exception("'%s' does not a Controller class" % controller.__name__)
@@ -157,18 +158,32 @@ class Router(object):
     def delete(self, uri, controller, action):
         return self.add(uri, methods=['DELETE'], controller=controller, action=action)
 
-    def trace(self, uri, controller, action):
-        return self.add(uri, methods=['TRACE'], controller=controller, action=action)
+    def route(self, uri, controller, action, methods=['GET']):
+        return self.add(uri, methods=methods, controller=controller, action=action)
 
     def add(self, uri, methods, controller, action):
         uri = add_slash(uri)
         for m in set(methods):
             r = Route(uri=uri, method=m, controller=controller, action=action)
-            if r.is_static():
-                self.static_routes.setdefault(uri, {}).setdefault(r.method, r)
-            else:
-                self.dynamic_routes.setdefault(r.slash_count, []).append(r)
-                self.max_slash_count = max(self.dynamic_routes.keys())
+            self.add_route(r)
+        return self
+
+    def all_routes(self):
+        for uri, method_and_route in self.static_routes.items():
+            for method, route in method_and_route.items():
+                yield route
+
+        for slash_count, routes in self.dynamic_routes.items():
+            for r in routes:
+                yield r
+
+    def add_route(self, route):
+        r = route
+        if r.is_static():
+            self.static_routes.setdefault(r.uri, {}).setdefault(r.method, r)
+        else:
+            self.dynamic_routes.setdefault(r.slash_count, []).append(r)
+            self.max_slash_count = max(self.dynamic_routes.keys())
         return self
 
     def match(self, uri, method):

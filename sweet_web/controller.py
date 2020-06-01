@@ -3,9 +3,27 @@ from sanic.views import HTTPMethodView
 from sanic.response import text, json
 from sanic.exceptions import InvalidUsage, NotFound
 from hashlib import md5
+from functools import wraps
+from sweet_web.application import Application, routes_q
 
 
-class Controller(object):
+class ControllerMetaClass(type):
+
+    def __init__(cls, name, bases, attr):
+
+        if name != 'Controller':
+            while True:
+                r = routes_q.get()
+                if r:
+                    r['controller'] = cls
+                    Application.router.add(**r)
+                else:
+                    break
+
+        return type.__init__(cls, name, bases, attr)
+
+
+class Controller(metaclass=ControllerMetaClass):
 
     def __init__(self, request):
         self.request = request
