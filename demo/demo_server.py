@@ -6,14 +6,6 @@ from sweet_web.router import Router
 
 class UserController(Controller):
     
-    @get('/hello')
-    async def hello(self):
-        return self.render_str('UserController#Hello')
-
-    @get('/hello2/<name>')
-    async def hello2(self, name):
-        return self.render_str('UserController#Hello2: %s[%s]' % (name, type(name)))
-
     async def list(self):
         return self.render_str('UserController#list')
 
@@ -33,6 +25,21 @@ class UserController(Controller):
     def update(self, id):
         print ("update")
         return self.render_str('UserController#update:%s[%s]' % (id, type(id)))
+
+
+class HelloController(Controller):
+
+    @get('/hello')
+    async def hello(self):
+        return self.render_str('HelloController#Hello')
+
+    @get('/hello2/<name>')
+    async def hello2(self, name):
+        return self.render_str('HelloController#Hello2: %s[%s]' % (name, type(name)))
+
+    @route('/hello3/<name>', methods=['GET', 'POST'])
+    async def hello3(self, name):
+        return self.render_str('HelloController#Hello3: %s[%s], HTTP[%s]' % (name, type(name), self.request.method.upper()))
 
 
 router = Router()
